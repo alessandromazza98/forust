@@ -1,3 +1,4 @@
+use rug::Float;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Debug, Display};
 use std::iter::Sum;
@@ -13,23 +14,25 @@ pub trait FloatData<T>:
     + Add<Output = T>
     + Div<Output = T>
     + Neg<Output = T>
-    + Copy
+    // + Copy
     + Debug
     + PartialEq
     + PartialOrd
     + AddAssign
     + Sub<Output = T>
     + SubAssign
-    + Sum
+    // + Sum
     + std::marker::Send
     + std::marker::Sync
+    // this is needed because we deleted `Sum`
+    + Sized
 {
-    const ZERO: T;
-    const ONE: T;
-    const MIN: T;
-    const MAX: T;
-    const NAN: T;
-    const INFINITY: T;
+    // const ZERO: T;
+    // const ONE: T;
+    // const MIN: T;
+    // const MAX: T;
+    // const NAN: T;
+    // const INFINITY: T;
     fn from_usize(v: usize) -> T;
     fn from_u16(v: u16) -> T;
     fn is_nan(self) -> bool;
@@ -37,12 +40,12 @@ pub trait FloatData<T>:
     fn exp(self) -> T;
 }
 impl FloatData<f64> for f64 {
-    const ZERO: f64 = 0.0;
-    const ONE: f64 = 1.0;
-    const MIN: f64 = f64::MIN;
-    const MAX: f64 = f64::MAX;
-    const NAN: f64 = f64::NAN;
-    const INFINITY: f64 = f64::INFINITY;
+    // const ZERO: f64 = 0.0;
+    // const ONE: f64 = 1.0;
+    // const MIN: f64 = f64::MIN;
+    // const MAX: f64 = f64::MAX;
+    // const NAN: f64 = f64::NAN;
+    // const INFINITY: f64 = f64::INFINITY;
 
     fn from_usize(v: usize) -> f64 {
         v as f64
@@ -62,12 +65,12 @@ impl FloatData<f64> for f64 {
 }
 
 impl FloatData<f32> for f32 {
-    const ZERO: f32 = 0.0;
-    const ONE: f32 = 1.0;
-    const MIN: f32 = f32::MIN;
-    const MAX: f32 = f32::MAX;
-    const NAN: f32 = f32::NAN;
-    const INFINITY: f32 = f32::INFINITY;
+    // const ZERO: f32 = 0.0;
+    // const ONE: f32 = 1.0;
+    // const MIN: f32 = f32::MIN;
+    // const MAX: f32 = f32::MAX;
+    // const NAN: f32 = f32::NAN;
+    // const INFINITY: f32 = f32::INFINITY;
 
     fn from_usize(v: usize) -> f32 {
         v as f32
@@ -82,6 +85,53 @@ impl FloatData<f32> for f32 {
         self.ln()
     }
     fn exp(self) -> f32 {
+        self.exp()
+    }
+}
+
+// TODO: 2 other problems is that `FloadData` require its generic type to
+// implement `Sum` and `Copy` - Float doesn't implement them.
+impl FloatData<Float> for Float {
+    // TODO: how to achieve it in a `conts` - don't think it's possible
+    // we may have to change the trait
+    // const ZERO: Float = Float::new(300) ;
+    // const ZERO: Float = todo!();
+
+    // TODO: how to achieve it in a `conts` - don't think it's possible
+    // we may have to change the trait
+    // const ONE: Float = Float::with_val(300, 1);
+    // const ONE: Float = todo!();
+
+    // TODO: there is no `MIN` in Float
+    // const MIN: Float = todo!();
+
+    // TODO: there is no `MAX` in Float
+    // const MAX: Float = todo!();
+
+    // const NAN: Float = todo!();
+
+    // TODO: how to achieve it in a `conts` - don't think it's possible
+    // we may have to change the trait
+    // const INFINITY: Float = Float::with_val(300, 1) / 0;
+    // const INFINITY: Float = todo!();
+
+    fn from_usize(v: usize) -> Float {
+        Float::with_val(300, v)
+    }
+
+    fn from_u16(v: u16) -> Float {
+        Float::with_val(300, v)
+    }
+
+    fn is_nan(self) -> bool {
+        Float::is_nan(&self)
+    }
+
+    fn ln(self) -> Float {
+        self.ln()
+    }
+
+    fn exp(self) -> Float {
         self.exp()
     }
 }
